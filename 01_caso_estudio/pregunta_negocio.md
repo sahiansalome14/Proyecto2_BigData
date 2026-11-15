@@ -12,3 +12,4 @@ A partir de la información recopilada sobre los exoplanetas y sus sistemas plan
 8. **Diversidad de tamaños:** ¿Qué sistemas planetarios contienen exoplanetas pertenecientes a diferentes categorías de tamaño?
 
 Estas preguntas orientarán las consultas SQL, el análisis con PySpark y las visualizaciones del proyecto.
+
