@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWS CloudFormation Template for Exoplanets Data Lake Storage (Amazon S3).
+  Creates an S3 bucket configured for the Data Lake zones (raw, trusted, gold),
+  with server-side encryption and public access blocks.
+
+Parameters:
+  BucketPrefix:
+    Type: String
+    Default: exoplanets-data-lake
+    Description: Prefix for the S3 bucket name. Must be lowercase without special characters.
+
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+      - lab
+    Description: Deployment environment.
+
+Resources:
+  DataLakeBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      # S3 bucket names must be globally unique. Using AWS::AccountId and AWS::Region ensures uniqueness.
+      BucketName: !Sub '${BucketPrefix}-${AWS::AccountId}-${AWS::Region}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Project
+          Value: ExoplanetsBigData
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+Outputs:
+  BucketName:
+    Description: Name of the created Data Lake S3 Bucket.
+    Value: !Ref DataLakeBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-BucketName'
+
+  BucketArn:
+    Description: ARN of the created Data Lake S3 Bucket.
+    Value: !GetAtt DataLakeBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-BucketArn'
+
+  RawZoneUri:
+    Description: S3 URI for the Raw zone.
+    Value: !Sub 's3://${DataLakeBucket}/raw/'
+
+  TrustedZoneUri:
+    Description: S3 URI for the Trusted zone.
+    Value: !Sub 's3://${DataLakeBucket}/trusted/'
+
+  GoldZoneUri:
+    Description: S3 URI for the Gold zone.
+    Value: !Sub 's3://${DataLakeBucket}/gold/'
