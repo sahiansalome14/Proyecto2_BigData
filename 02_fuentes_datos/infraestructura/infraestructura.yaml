@@ -1,0 +1,306 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  Reproducible infrastructure for the Exoplanets project.
+  Creates a VPC, public and private subnets, EC2 Ubuntu
+  instance and private Amazon RDS MariaDB database.
+
+# PARAMETERS
+
+Parameters:
+
+  EnvironmentName:
+    Type: String
+    Default: exoplanets
+    Description: Prefix used to name AWS resources.
+
+  VpcCidr:
+    Type: String
+    Default: 10.20.0.0/16
+
+  PublicSubnetCidr:
+    Type: String
+    Default: 10.20.1.0/24
+
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: 10.20.11.0/24
+
+  PrivateSubnet2Cidr:
+    Type: String
+    Default: 10.20.12.0/24
+
+  LatestUbuntuAmi:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/canonical/ubuntu/server/noble/stable/current/amd64/hvm/ebs-gp3/ami-id
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing EC2 key pair in the deployment region.
+
+  EC2InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+
+  SSHLocation:
+    Type: String
+    Description: Authorized IPv4 CIDR for SSH, for example 203.0.113.10/32
+    AllowedPattern: ^(\d{1,3}\.){3}\d{1,3}/\d{1,2}$
+
+  DBName:
+    Type: String
+    Default: exoplanets_db
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]*'
+
+  DBUsername:
+    Type: String
+    Default: admin_exoplanets
+    MinLength: 1
+    MaxLength: 16
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]*'
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    MaxLength: 41
+    Description: Master password for MariaDB.
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    AllowedValues:
+      - db.t3.micro
+      - db.t4g.micro
+
+  DBAllocatedStorage:
+    Type: Number
+    Default: 20
+    MinValue: 20
+    MaxValue: 100
+
+# NETWORK AND SECURITY
+
+Resources:
+
+  # VPC
+  ExoplanetsVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-vpc'
+
+  # Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-igw'
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ExoplanetsVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Public subnet for EC2
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ExoplanetsVPC
+      CidrBlock: !Ref PublicSubnetCidr
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ''
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-public-subnet'
+
+  # Private subnet 1 for RDS
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ExoplanetsVPC
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ''
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-private-subnet-1'
+
+  # Private subnet 2 for RDS
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ExoplanetsVPC
+      CidrBlock: !Ref PrivateSubnet2Cidr
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ''
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-private-subnet-2'
+
+  # Public route table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ExoplanetsVPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-public-rt'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  # EC2 security group
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH from the authorized IP.
+      VpcId: !Ref ExoplanetsVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-ec2-sg'
+
+  # RDS security group
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow MariaDB only from the EC2 security group.
+      VpcId: !Ref ExoplanetsVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-rds-sg'
+
+# DATABASE SUBNET GROUP
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for Exoplanets MariaDB.
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-db-subnet-group'
+
+# EC2 INSTANCE
+
+  ExoplanetsEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestUbuntuAmi
+      InstanceType: !Ref EC2InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 8
+            VolumeType: gp3
+            DeleteOnTermination: true
+            Encrypted: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-ec2'
+
+# RDS MARIADB INSTANCE
+
+  ExoplanetsRDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub '${EnvironmentName}-db'
+      Engine: mariadb
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref DBAllocatedStorage
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: !Ref DBName
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      Port: 3306
+      VPCSecurityGroups:
+        - !GetAtt RDSSecurityGroup.GroupId
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      PubliclyAccessible: false
+      MultiAZ: false
+      BackupRetentionPeriod: 0
+      DeletionProtection: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-db'
+
+# OUTPUTS
+
+Outputs:
+
+  VPCId:
+    Description: Created VPC ID.
+    Value: !Ref ExoplanetsVPC
+
+  EC2InstanceId:
+    Description: EC2 instance ID.
+    Value: !Ref ExoplanetsEC2
+
+  EC2PublicIP:
+    Description: Public IP address of EC2.
+    Value: !GetAtt ExoplanetsEC2.PublicIp
+
+  EC2SecurityGroupId:
+    Description: EC2 security group ID.
+    Value: !Ref EC2SecurityGroup
+
+  RDSSecurityGroupId:
+    Description: RDS security group ID.
+    Value: !GetAtt RDSSecurityGroup.GroupId
+
+  RDSEndpoint:
+    Description: MariaDB connection endpoint.
+    Value: !GetAtt ExoplanetsRDS.Endpoint.Address
+
+  RDSPort:
+    Description: MariaDB port.
+    Value: !GetAtt ExoplanetsRDS.Endpoint.Port
+
+  DatabaseName:
+    Description: Database name.
+    Value: !Ref DBName
