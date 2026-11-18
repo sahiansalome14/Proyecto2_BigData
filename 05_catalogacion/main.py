@@ -3,9 +3,9 @@
 import argparse
 
 from config import Settings
-from emr_cluster import create_cluster, terminate_cluster, wait_for_cluster
-from glue_catalog import catalog_with_glue
-from hive_catalog import catalog_with_hive
+from emr_hive.emr_cluster import create_cluster, terminate_cluster, wait_for_cluster
+from emr_hive.hive_catalog import catalog_with_hive
+from aws_glue.glue_catalog import catalog_with_glue
 
 
 def main() -> None:
