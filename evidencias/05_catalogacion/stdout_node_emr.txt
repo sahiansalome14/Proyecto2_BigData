@@ -1,0 +1,47 @@
+Completed 623 Bytes/623 Bytes (16.7 KiB/s) with 1 file(s) remainingdownload: s3://exoplanets-data-lake-993664021661-us-east-1/cataloging-temp/93bae14c89744dae8dd59c942d5ffdb0.hql to ../../../../../../tmp/cataloging.hql
+# col_name            	data_type           	comment             
+pl_name             	string              	                    
+hostname            	string              	                    
+pl_rade             	double              	                    
+pl_bmasse           	double              	                    
+pl_orbper           	double              	                    
+sy_dist             	double              	                    
+sy_pnum             	int                 	                    
+discoverymethod     	string              	                    
+disc_year           	int                 	                    
+disc_facility       	string              	                    
+size_category       	string              	                    
+is_earth_similar    	boolean             	                    
+is_multiplanet_system	boolean             	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	curated_hive        	 
+OwnerType:          	USER                	 
+Owner:              	hadoop              	 
+CreateTime:         	Tue Nov 17 23:47:40 UTC 2026	 
+LastAccessTime:     	UNKNOWN             	 
+Retention:          	0                   	 
+Location:           	s3://exoplanets-data-lake-993664021661-us-east-1/trusted/exoplanets	 
+Table Type:         	EXTERNAL_TABLE      	 
+Table Parameters:	 	 
+	EXTERNAL            	TRUE                
+	bucketing_version   	2                   
+	numFiles            	1                   
+	totalSize           	215138              
+	transient_lastDdlTime	1794959260          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe	 
+InputFormat:        	org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	serialization.format	1                   
+11 Com b	11 Com	NULL	4914.89848585	323.21	93.1846	1	Radial Velocity	2007	Xinglong Station	No determinado	false	false
+11 UMi b	11 UMi	NULL	4684.8142	516.21997	125.321	1	Radial Velocity	2009	Thueringer Landessternwarte Tautenburg	No determinado	false	false
+14 And b	14 And	NULL	1131.15130051	186.76	75.4392	1	Radial Velocity	2008	Okayama Astrophysical Observatory	No determinado	false	false
+14 Her b	14 Her	NULL	2828.6728223	NULL	17.9323	2	Radial Velocity	2002	W. M. Keck Observatory	No determinado	false	true
+HD 145675 c	14 Her	NULL	2510.8444153	NULL	17.9323	2	Radial Velocity	2021	Multiple Observatories	No determinado	false	true

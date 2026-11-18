@@ -71,6 +71,15 @@ CREATE TABLE planetary_systems (
 ) ENGINE=InnoDB;
 ```
 
+Para lanzar el script, ejecute:
+
+```cmd
+sudo apt install mariadb-client-core
+mariadb -h $DB_HOST -u $DB_USER -p exoplanets_db < create_tables.sql
+```
+
+Para poder establecer conexión, le pedirá la contraseña que asignó a la base de datos, por favor, escribala. De esta forma, ya creamos las tablas en nuestra base de datos `exoplanets_db`
+
 ---
 
 ## 4. Extracción y carga automatizada (`insert_data.py`)
@@ -108,7 +117,7 @@ export DB_PORT="3306"
 # Activar entorno virtual e instalar dependencias
 python3 -m venv .venv
 source .venv/bin/activate
-pip install requests pymysql
+pip install -r requirements.txt
 
 # Ejecutar la inserción
 python insert_data.py

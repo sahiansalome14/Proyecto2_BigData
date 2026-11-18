@@ -179,10 +179,29 @@ ssh -i vockey.pem ubuntu@<EC2PublicIP>   # O ec2-user según la AMI
 Desde la EC2, se crean las tablas y se cargan los registros hacia MariaDB:
 ```bash
 cd ~/Proyecto2_BigData/02_fuentes_datos/01_rds_mariadb
+
 export DB_HOST="<RDSEndpoint>"
 export DB_USER="admin_exoplanets"
 export DB_PASSWORD="<TuPassword>"
+```
+
+Para instalar python3, si no lo tiene:
+```bash
+sudo apt install python3 python3-pip python3-venv -y
+```
+
+Configuramos entorno:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requeriments.txt
+```
+
+Ejecutamos script para poblar tabla:
+```bash
 python3 insert_data.py
+```
+
 ```
 *(Detalles en [01_rds_mariadb/README.md](01_rds_mariadb/README.md))*
 
