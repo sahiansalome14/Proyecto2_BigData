@@ -1,2 +1,25 @@
+# Python
 __pycache__/
+*.pyc
+.venv/
+venv/
+
+# Credenciales y configuración local
 .env
+*.pem
+lambda-env.json
+
+# Artefactos de despliegue de Lambda
+08_visualizacion_api/streamlit_api/package/
+*.zip
+
+# Pruebas locales de la Lambda
+event_test.json
+response.json
+
+# Gráficos generados
+08_visualizacion_api/plotly/graficos/
+
+# Editor / sistema
+.vscode/
+.DS_Store
