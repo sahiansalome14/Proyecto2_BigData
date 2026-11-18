@@ -48,7 +48,7 @@ Se creó una instancia virtual en el servicio **Amazon EC2** con las siguientes 
 
 | Parámetro | Valor configurado | Justificación |
 |---|---|---|
-| **Nombre** | `ec2-exoplanets-files` | Identificador estándar del recurso |
+| **Nombre** | `exoplanets-ec2` | Identificador estándar del recurso |
 | **AMI** | Amazon Linux 2023 AMI (HVM, SSD) | Sistema operativo ligero y optimizado para AWS |
 | **Arquitectura** | 64 bits (x86) | Compatibilidad estándar de herramientas y CLI |
 | **Tipo de instancia** | `t2.micro` o `t3.micro` | Incluida en la capa gratuita / AWS Learner Lab (1 vCPU, 1 GiB RAM) |
