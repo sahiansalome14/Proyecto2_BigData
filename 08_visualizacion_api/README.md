@@ -28,7 +28,7 @@ Lee el Parquet desde S3 y presenta cuatro gráficos interactivos (Top 10 de estr
 
 ### 2.2. `streamlit_api/`: aplicación con API Gateway
 
-Aplicación Streamlit para buscar planetas, filtrar por categoría de tamaño y por similitud con la Tierra, y ver la distribución por tamaño. No lee S3 directamente: consulta por HTTP una API en API Gateway que invoca una función Lambda, y esta lee el Parquet.
+Aplicación Streamlit para buscar planetas, filtrar por categoría de tamaño y por similitud con la Tierra, ver la distribución por tamaño, los 10 exoplanetas de mayor radio y los 10 sistemas más cercanos. No lee S3 directamente: consulta por HTTP una API en API Gateway que invoca una función Lambda, y esta lee el Parquet.
 
 - Ejecución: `streamlit run app.py`, con la variable `API_URL` apuntando a la API.
 - Detalle y despliegue de Lambda y API Gateway: [streamlit_api/README.md](streamlit_api/README.md).

@@ -1,7 +1,7 @@
 """Lambda única detrás de API Gateway (HTTP API). Lee el Parquet de S3 con Boto3 + PyArrow.
 
 Endpoints:
-  GET /planets?q=&size_category=&earth_like=true   (filtros combinables)
+  GET /planets?q=&size_category=&earth_like=true&sort=sy_dist   (filtros combinables; sort opcional)
   GET /statistics/size
 """
 import io
@@ -51,6 +51,10 @@ def get_planets(params):
     if len(q) > 100 or len(size) > 100:
         return response(400, {"error": "parámetro demasiado largo"})
 
+    sort = (params.get("sort") or "").strip()
+    if sort not in ("", "sy_dist"):
+        return response(400, {"error": "sort solo admite sy_dist"})
+
     rows = load_planets()
     if q:
         rows = [r for r in rows if r["pl_name"] and q.lower() in r["pl_name"].lower()]
@@ -58,7 +62,9 @@ def get_planets(params):
         rows = [r for r in rows if r["size_category"] == size]
     if earth == "true":
         rows = [r for r in rows if r["is_earth_similar"]]
-    return response(200, {"total": len(rows), "limit": MAX_RESULTS, "planets": rows[:MAX_RESULTS]})
+    if sort:  # ascendente, sin valores nulos: los sistemas más cercanos primero
+        rows = sorted((r for r in rows if r[sort] is not None), key=lambda r: r[sort])
+    return response(200, {"total": len(rows), "limit": MAX_RESULTS, "sort": sort, "planets": rows[:MAX_RESULTS]})
 
 
 def get_size_statistics():

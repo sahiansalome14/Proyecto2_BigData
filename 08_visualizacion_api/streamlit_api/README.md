@@ -24,6 +24,7 @@ flowchart LR
 | `GET /planets?q=Kepler-22` | Busca por nombre (contiene el texto, sin distinguir mayúsculas). |
 | `GET /planets?size_category=Super-Tierra` | Filtra por categoría de tamaño. |
 | `GET /planets?earth_like=true` | Solo planetas con `is_earth_similar = true`. |
+| `GET /planets?sort=sy_dist` | Ordena de menor a mayor distancia (sin nulos); se usa para los sistemas más cercanos. |
 | `GET /statistics/size` | Cantidad de planetas por categoría de tamaño. |
 
 Los tres filtros de `/planets` se pueden combinar. Responde JSON, valida `earth_like` (`true`/`false`) y la longitud de los parámetros (400 si son inválidos), y devuelve como máximo 200 registros (`total` indica cuántos coinciden).
@@ -155,6 +156,8 @@ Streamlit consume la API mediante solicitudes HTTP con `requests`:
 - Selección de planetas similares a la Tierra.
 - Resultados en una tabla.
 - Gráfico de distribución de planetas por categoría de tamaño.
+- Los 10 exoplanetas de mayor radio, como círculos proporcionales al radio, con su masa .
+- Gráfico de barras horizontales con los 10 sistemas planetarios más cercanos a la Tierra.
 
 ## Pruebas locales sin desplegar (opcional)
 
