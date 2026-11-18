@@ -86,7 +86,7 @@ En la terminal donde vas a ejecutar el programa, ajusta estos valores de ejemplo
 # variables obligatorios
 export PARQUET_S3_URI="s3://mi-bucket/curated/usuarios/"
 export GLUE_ROLE_ARN="arn:aws:iam::123456789012:role/LabRole"
-export EMR_SUBNET_ID="subnet-varibales "alor predeterminado
+export EMR_SUBNET_ID="subnet-xxx"
 
 # varibales opcionales, cuentan con valor predeterminado que se indica a continuación 
 export AWS_REGION="us-east-1"
@@ -99,7 +99,7 @@ export HIVE_DATABASE="curated_hive"
 export HIVE_TABLE="curated_data"
 
 export EMR_RELEASE="emr-7.12.0"
-export EMR_INSTANCE_TYPE="m5.xlarge"
+export EMR_INSTANCE_TYPE="m4.xlarge"
 ```
 
 Opcionalmente, para conservar los registros de EMR en S3:
