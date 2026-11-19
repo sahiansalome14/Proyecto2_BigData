@@ -61,7 +61,7 @@ Al ejecutar `main.py`, primero se realiza la catalogación con Glue. Luego se cr
 
 Se necesitan:
 
-1. Una carpeta de S3 con archivos Parquet sin particiones y con esquemas compatibles entre sí. En nuestro caso, usaremos '/trusted', que es donde almacenamos la data después de sanitalizarla.
+1. Una carpeta de S3 con archivos Parquet sin particiones y con esquemas compatibles entre sí. En nuestro caso, usaremos '/trusted', que es donde almacenamos la data después de sanitizarla.
 2. Credenciales AWS vigentes y permisos para Glue, S3, EMR y `iam:PassRole` cuando corresponda, en nuestro caso, se usa credenciales dadas por AWS Academy.
 3. Un rol IAM que Glue pueda asumir y que pueda leer la carpeta S3 (por ejemplo, `LabRole`, **solo si** tiene la confianza y permisos adecuados).
 4. Roles existentes para el servicio EMR y sus instancias EC2, y una subnet con conectividad suficiente.
