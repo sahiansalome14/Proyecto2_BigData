@@ -1,6 +1,5 @@
 """Dashboard Dash 'Explorador de Exoplanetas': reúne los cuatro gráficos de visualizaciones.py."""
 from dash import Dash, dcc, html
-
 from data_loader import load_exoplanets
 from visualizaciones import (descubrimientos_por_anio, distribucion_por_tamano,
                              estrellas_con_mas_planetas, masa_vs_radio)
