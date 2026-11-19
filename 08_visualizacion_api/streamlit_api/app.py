@@ -66,10 +66,12 @@ st.subheader("Los 10 exoplanetas de mayor radio")
 grandes = api_client.largest_planets()
 if grandes:
     rmax = max(p["pl_rade"] for p in grandes)
+    rmin = min(p["pl_rade"] for p in grandes)
     tonos = ["#c9a98a", "#d3a08f", "#c9b79a", "#cfa98c", "#b98a6b"]
     items = ""
     for i, p in enumerate(grandes):
-        d = max(30, round(150 * p["pl_rade"] / rmax))  # diámetro proporcional al radio
+       
+        d = round(40 + 120 * (p["pl_rade"] - rmin) / ((rmax - rmin) or 1))
         masa = f"{p['pl_bmasse']:.1f} M⊕" if p["pl_bmasse"] is not None else "sin dato"
         items += (f'<div style="text-align:center;min-width:110px">'
                   f'<b>{p["pl_name"]}</b><br><small style="color:#9aa4d6">Radio: {p["pl_rade"]:.1f} R⊕<br>Masa: {masa}</small>'

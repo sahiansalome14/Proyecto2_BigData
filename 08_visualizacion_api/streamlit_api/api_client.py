@@ -2,7 +2,7 @@
 import os
 import requests
 
-API_URL = os.environ["API_URL"].rstrip("/")  # lee la URL del API Gateway 
+API_URL = os.environ["API_URL"].strip().rstrip("/")  # lee la URL del API Gateway 
 
 
 def _get(path, params=None): #llama a la api y converte la respuesta en JSON
