@@ -1,10 +1,10 @@
 # Visualización de datos con Plotly y Dash
 
-## 1. Introducción y propósito
+## 1. Introducción 
 
-Genera cuatro gráficos interactivos a partir del Parquet `s3://exoplanets-data-lake-225180590593-us-east-1/trusted/exoplanets/` y los reúne en un único dashboard con pestañas e indicadores: `graficos/dashboard.html`.
+Esta página web genera cuatro gráficos interactivos a partir del Parquet `s3://exoplanets-data-lake-225180590593-us-east-1/trusted/exoplanets/` y los reúne en un único dashboard con pestañas e indicadores: `graficos/dashboard.html`.
 
-Los gráficos responden a las preguntas de negocio del Punto 6 y se presentan en una aplicación web hecha con Dash ("Explorador de Exoplanetas"). No se modifican ni se copian los datos de S3.
+Los gráficos responden a las preguntas de negocio planteadas desde el inicio del proyecto y se presentan en una aplicación web hecha con Dash ("Explorador de Exoplanetas") donde no se modifican ni se copian los datos de S3.
 
 ---
 

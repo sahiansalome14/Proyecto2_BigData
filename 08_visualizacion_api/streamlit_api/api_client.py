@@ -1,17 +1,16 @@
-"""Cliente HTTP de la API (API Gateway). Streamlit solo habla con este módulo."""
+"""Cliente HTTP de la API Gateway -> Streamlit solo habla con este módulo."""
 import os
-
 import requests
 
-API_URL = os.getenv("API_URL", "http://localhost:3000").rstrip("/")  # URL del API Gateway
+API_URL = os.environ["API_URL"].rstrip("/")  # lee la URL del API Gateway 
 
 
-def _get(path, params=None):
+def _get(path, params=None): #llama a la api y converte la respuesta en JSON
     r = requests.get(f"{API_URL}{path}", params=params, timeout=30)
     r.raise_for_status()
     return r.json()
 
-
+# llama al endpoint GET /planets
 def search_planets(q="", size_category="", earth_like=False, sort=""):
     params = {}
     if sort:
@@ -22,13 +21,14 @@ def search_planets(q="", size_category="", earth_like=False, sort=""):
         params["size_category"] = size_category
     if earth_like:
         params["earth_like"] = "true"
-    return _get("/planets", params)
+    return _get("/planets", params) # devuelve el JSON completo
 
-
-def size_statistics():
+# llama al endpoint GET /statistics/size
+def size_statistics(): # solo devuelve una lista con categoria y cantidad de planetas que hay en esa categoria
     return _get("/statistics/size")["statistics"]
 
-
+# como no hay endpoint para eso los calcula, usa search_plantes para pedir plantes de 2 cateogirias
+# Otro / No clasificado" y "Gigante gaseoso" que son las de mayor radio y los ordena
 def largest_planets(n=10):
     """Los n planetas de mayor radio, usando solo /planets (las categorías de radio más grande)."""
     rows = []
@@ -37,7 +37,7 @@ def largest_planets(n=10):
     rows = [r for r in rows if r["pl_rade"] is not None]
     return sorted(rows, key=lambda r: r["pl_rade"], reverse=True)[:n]
 
-
+# Pide los planetas ordenados por distancia y devueve las primeras no repetidas
 def closest_systems(n=10):
     """Los n sistemas (estrellas) más cercanos. Requiere que la Lambda soporte sort=sy_dist."""
     res = search_planets(sort="sy_dist")
